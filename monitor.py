@@ -1,15 +1,22 @@
 import psutil
 import time
+import sqlite3
 
-try:
-    while True:
-        cpu = psutil.cpu_percent(interval=1)
-        memory = psutil.virtual_memory().percent
-        disk = psutil.disk_usage('/').percent
+conn = sqlite3.connect("metrics.db")
+cursor = conn.cursor()
 
-        print(f"CPU: {cpu}% | Memory: {memory}% | Disk: {disk}%")
+while True:
+    cpu = psutil.cpu_percent()
+    memory = psutil.virtual_memory().percent
+    disk = psutil.disk_usage('/').percent
 
-        time.sleep(4)
+    cursor.execute("""
+        INSERT INTO system_metrics (cpu, memory, disk)
+        VALUES (?, ?, ?)
+    """, (cpu, memory, disk))
 
-except KeyboardInterrupt:
-    print("\nMonitoring stopped by user.")
+    conn.commit()
+
+    print(f"Saved -> CPU: {cpu}% | Memory: {memory}% | Disk: {disk}%")
+
+    time.sleep(5)
