@@ -3,10 +3,7 @@
 <head>
     <title>Infrastructure Monitoring Dashboard</title>
 
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <!-- Flask static file loading -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
@@ -15,15 +12,22 @@
 <h1>Infrastructure Monitoring Dashboard</h1>
 
 <div class="container">
-    <div class="card">
+
+    <div class="card half">
         <h2>CPU Usage</h2>
         <canvas id="cpuChart"></canvas>
     </div>
 
-    <div class="card">
+    <div class="card half">
         <h2>Memory Usage</h2>
         <canvas id="memoryChart"></canvas>
     </div>
+
+    <div class="card full">
+        <h2>Disk Usage</h2>
+        <canvas id="diskChart"></canvas>
+    </div>
+
 </div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
