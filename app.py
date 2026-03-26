@@ -1,10 +1,13 @@
 from flask import Flask, render_template, jsonify
-
 import sqlite3
 import os
+import threading
 
-# NEW: import anomaly detection
+# Import anomaly detection
 from analytics.anomaly import detect_anomalies
+
+# Import monitoring collector
+from monitor import collect_metrics
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -17,6 +20,20 @@ app = Flask(
 DB_PATH = os.path.join(BASE_DIR, "metrics.db")
 
 
+# -------------------------------
+# Background monitoring thread
+# -------------------------------
+def start_monitor():
+    collect_metrics()
+
+
+# Start monitoring in background (works in Docker + Render)
+threading.Thread(target=start_monitor, daemon=True).start()
+
+
+# -------------------------------
+# Database read function
+# -------------------------------
 def get_metrics():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -44,7 +61,11 @@ def get_metrics():
     return list(reversed(data))
 
 
+# -------------------------------
+# Routes
+# -------------------------------
 @app.route("/")
+@app.route("/dashboard")
 def dashboard():
     return render_template("index.html")
 
@@ -54,12 +75,19 @@ def history():
     return jsonify(get_metrics())
 
 
-# NEW ROUTE: AI anomaly detection
 @app.route("/metrics/anomalies")
 def anomaly_history():
-    from analytics.anomaly import detect_anomalies
     return jsonify(detect_anomalies())
 
 
+# Health check for Render
+@app.route("/healthz")
+def health():
+    return "OK", 200
+
+
+# -------------------------------
+# Local development run
+# -------------------------------
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
