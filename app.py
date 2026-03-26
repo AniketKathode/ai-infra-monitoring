@@ -23,12 +23,13 @@ DB_PATH = os.path.join(BASE_DIR, "metrics.db")
 # -------------------------------
 # Background monitoring thread
 # -------------------------------
-def start_monitor():
-    collect_metrics()
+def start_background_tasks():
+    t = threading.Thread(target=collect_metrics)
+    t.daemon = True
+    t.start()
 
-
-# Start monitoring in background (works in Docker + Render)
-threading.Thread(target=start_monitor, daemon=True).start()
+# Start background monitoring
+start_background_tasks()
 
 
 # -------------------------------
@@ -80,7 +81,7 @@ def anomaly_history():
     return jsonify(detect_anomalies())
 
 
-# Health check for Render
+# Health check for cloud platforms
 @app.route("/healthz")
 def health():
     return "OK", 200
@@ -90,4 +91,4 @@ def health():
 # Local development run
 # -------------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
