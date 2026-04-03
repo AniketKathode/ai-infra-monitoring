@@ -9,7 +9,7 @@
 ## About This Project
 
 I built **Smart Monitor** to understand how real-world infrastructure monitoring systems work.  
-The project collects live system metrics (CPU, memory, disk), stores them in a database, displays them on a dashboard, and detects unusual behaviour using statistical data science techniques.
+The project collects live system metrics (CPU, memory, disk), stores them in a database, displays them on a dashboard, and detects unusual behaviour using statistical data science techniques
 
 This project helped me combine:
 - backend development
